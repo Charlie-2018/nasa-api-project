@@ -6,16 +6,43 @@ class Dashboard extends Component {
 	constructor(props) {
 		super(props)
 		this.state = {
-			neoData: apiData.near_earth_objects
+			neoData: apiData.near_earth_objects["2018-07-09"],
+			issCoords: {
+				long: "",
+				lat: ""
+			}
 		}
 	}
 
+	updateIssPosition = (lat, long) => {
+		let {issCoords} = this.state
+
+		issCoords.lat = lat
+		issCoords.long = long
+
+		console.log(lat, long);
+
+		this.setState({issCoords: issCoords })
+	}
+
+	componentWillMount() {
+		fetch('http://api.open-notify.org/iss-now.json')
+		.then(function(response) {
+			console.log(response);
+			return response.json();
+		})
+		.then((myJson) => {
+			console.log(myJson);
+			this.updateIssPosition(myJson.iss_position.latitude, myJson.iss_position.longitude)
+		});
+	}
+
 	render() {
-		// find the array/date
+		// TODO: find the array/date
 
 		// map over each item in the array
 		let near_earth_objects = this.state.neoData.map(function(element){
-			console.log(element.is_potentially_hazardous_asteroid);
+			// console.log(element.is_potentially_hazardous_asteroid);
 			return (
 				<tr className="table-success">
 				  <td>{element.name}</td>
@@ -36,9 +63,9 @@ class Dashboard extends Component {
 							This is a simple hero unit, a simple jumbotron-style component for calling extra attention to featured content or information.
 						</p>
 						<hr className="my-4" />
-						<p>
-							It uses utility classNamees for typography and spacing to space content out within the larger container.
-						</p>
+						<h3>International Space Station</h3>
+						<p>Latitude: {this.state.issCoords.lat}</p>
+						<p>Longitude: {this.state.issCoords.long}</p>
 						<p className="lead">
 							<a className="btn btn-primary btn-lg" href="#" role="button">
 								Learn more
